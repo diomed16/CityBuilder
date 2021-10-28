@@ -1,26 +1,22 @@
 #include <SFML/Graphics.hpp>
-
 #include "game_state_start.hpp"
-#include "game_state_editor.hpp"
 #include "game_state.hpp"
+#include "game_state_editor.hpp"
 
-
-
-void GameStateStart::draw(const float dt)
+void GameStateEditor::draw(const float dt)
 {
-    this->game->window.setView(this->view);
     this->game->window.clear(sf::Color::Black);
     this->game->window.draw(this->game->background);
+
     return;
 }
 
-void GameStateStart::update(const float dt)
+void GameStateEditor::update(const float dt)
 {
-
+    return;
 }
 
-
-void GameStateStart::handleInput()
+void GameStateEditor::handleInput()
 {
     sf::Event event;
 
@@ -31,23 +27,18 @@ void GameStateStart::handleInput()
             /* Close the window */
             case sf::Event::Closed:
             {
-                game->window.close();
+                this->game->window.close();
                 break;
             }
             /* Resize the window */
             case sf::Event::Resized:
             {
-                this->view.setSize(event.size.width, event.size.height);
-                this->game->background.setPosition(this->game->window.mapPixelToCoords(sf::Vector2i(0, 0)));
+                gameView.setSize(event.size.width, event.size.height);
+                guiView.setSize(event.size.width, event.size.height);
+                this->game->background.setPosition(this->game->window.mapPixelToCoords(sf::Vector2i(0, 0), this->guiView));
                 this->game->background.setScale(
                     float(event.size.width) / float(this->game->background.getTexture()->getSize().x),
                     float(event.size.height) / float(this->game->background.getTexture()->getSize().y));
-                break;
-            }
-            case sf::Event::KeyPressed:
-            {
-                if(event.key.code == sf::Keyboard::Escape) this->game->window.close();
-                else if(event.key.code== sf::Keyboard::Space) this->loadgame();
                 break;
             }
             default: break;
@@ -56,21 +47,14 @@ void GameStateStart::handleInput()
 
     return;
 }
-void GameStateStart::loadgame()
-{
-    this->game->pushState(new GameStateEditor(this->game));
 
-    return;
-}
-
-    GameStateStart::GameStateStart(Game* game)
+GameStateEditor::GameStateEditor(Game* game)
 {
     this->game = game;
     sf::Vector2f pos = sf::Vector2f(this->game->window.getSize());
-    this->view.setSize(pos);
+    this->guiView.setSize(pos);
+    this->gameView.setSize(pos);
     pos *= 0.5f;
-    this->view.setCenter(pos);
+    this->guiView.setCenter(pos);
+    this->gameView.setCenter(pos);
 }
-
-
-
